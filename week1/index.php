@@ -1,4 +1,4 @@
-<?php ?> <!--Anywhere-->
+<?php ?> <!-- could be put Anywhere -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,13 +9,11 @@
 </head>
 <body>
     
+    <?php 
 
-<?php 
+    echo "Hello!"; 
 
-echo "Hello!"; 
-
-?>
-
+    ?>
 
 </body>
 </html>
