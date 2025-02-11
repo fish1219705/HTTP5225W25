@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Colors</title>
 </head>
 <body>
 
+    <h2>Colors</h2>
+    
     <?php
     //connection string
     $connect = mysqli_connect('localhost', 'root', 'root', 'colors');
@@ -16,15 +18,16 @@
     }
 
     $query = "SELECT * FROM colors";
-    $colors = mysqli_query($connect, $query);
+    $result = mysqli_query($connect, $query);
 
-    //echo '<pre>' . print_r($colors) . '</pre>';
+    // echo '<pre>' . print_r($result) . '</pre>';
 
-    $result = mysqli_fetch_all($colors, MYSQLI_ASSOC);
-
-    foreach($result as $color){
-        echo '<div style="height: 50px; background-color:' . $color['Hex'] . '">' . $color['Name'] . '</div>';
+    while ($record = mysqli_fetch_assoc($result))
+    {
+        echo '<div style="height: 50px; background-color:' . $record['Hex'] . '">' . $record['Name'] . '</div>';
     }
+
+   
     
     //echo '<div style= height: 20px; background-color:black>COLOR NAME</div>';
 
