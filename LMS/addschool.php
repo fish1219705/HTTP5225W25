@@ -1,3 +1,27 @@
+<?php
+if(isset($_POST['addSchool'])){
+  //print_r($_POST);
+  //Array ( [boardname] => Gary [language] => English [schooltype] => Private [addSchool] => )
+  $boardname = $_POST['boardname'];
+  $language = $_POST['language'];
+  $schooltype = $_POST['schooltype'];
+
+  include('reusables/connection.php');
+  $query = "INSERT INTO schools (`Board`, `Language`, `School Type`) VALUES ('$boardname', '$language', '$schooltype')";
+  $school = mysqli_query($connect, $query);
+  if($school){
+    echo 'School added successfully.';
+  }
+  else {
+    echo 'Unable to add the school, Error code:' .mysqli_error();
+  }
+
+  
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +58,7 @@
           <input type="text" class="form-control" name="schooltype" id="schooltype" aria-describedby="schooltype">
         </div>
         
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" name="addSchool">Submit</button>
       </form>
       </div>
     </div>

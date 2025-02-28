@@ -22,7 +22,7 @@ echo 'Rows: ' .mysqli_num_rows($result);
 while($record = mysqli_fetch_assoc($result))
 {
     // Output each record
-    // print_t($record);
+    // print_r($record);
 
     echo '<h2>' .$record['name']. '</h2>';
     echo '<p>' .$record['league'] .'
@@ -38,5 +38,5 @@ while($record = mysqli_fetch_assoc($result))
 
 ?>
 
-how to use file zilla
+
 what is difference between those loops

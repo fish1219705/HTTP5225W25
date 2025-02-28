@@ -32,6 +32,17 @@
                       <span class="badge bg-primary">' . $school['School Type'] .'</span>
                       <span class="badge bg-success">' . $school['Language'] .'</span>
                     </div>
+                    <div class="card-footer">
+                      <form action="updateschool.php" method="GET">
+                        <input type="hidden" name="boardNo" value="' . $school['Board No'] . '">
+                        <button type="submit" name="updateSchool" class="btn-dm btn-success">Edit</button>
+                      </form>
+
+                      <form action="deleteschool.php" method="GET">
+                        <input type="hidden" name="boardNo" value="' . $school['Board No'] . '">
+                        <button type="submit" name="deleteSchool" class="btn-dm btn-success">Delete</button>
+                      </form>
+                    </div>
                   </div>
                 </div>';
         }
