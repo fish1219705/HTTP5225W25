@@ -1,7 +1,7 @@
 <?php
 
-include( 'includes/config.php' );
+include('includes/config.php');
 
 session_destroy();
 
-header( 'Location: index.php' );
+header('Location: index.php');

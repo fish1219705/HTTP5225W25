@@ -1,0 +1,15 @@
+   INFO  Model [C:\MAMP\htdocs\HTTP5225W25\laralms\app\Models\Student.php] created successfully.
+
+   INFO  Factory [C:\MAMP\htdocs\HTTP5225W25\laralms\database\factories\StudentFactory.php] created successfully.
+
+   INFO  Migration [C:\MAMP\htdocs\HTTP5225W25\laralms\database\migrations/2025_04_01_134405_create_students_table.php] created successfully.
+
+   INFO  Seeder [C:\MAMP\htdocs\HTTP5225W25\laralms\database\seeders\StudentSeeder.php] created successfully.
+
+   INFO  Request [C:\MAMP\htdocs\HTTP5225W25\laralms\app\Http\Requests\StoreStudentRequest.php] created successfully.
+
+   INFO  Request [C:\MAMP\htdocs\HTTP5225W25\laralms\app\Http\Requests\UpdateStudentRequest.php] created successfully.
+
+   INFO  Controller [C:\MAMP\htdocs\HTTP5225W25\laralms\app\Http\Controllers\StudentController.php] created successfully.
+
+   INFO  Policy [C:\MAMP\htdocs\HTTP5225W25\laralms\app\Policies\StudentPolicy.php] created successfully.

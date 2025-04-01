@@ -1,121 +1,134 @@
 <?php
 include('includes/database.php');
-include('includes/config.php');
-include('includes/functions.php');
+include('includes/config.php'); // Add this to have access to session functions
+include('includes/functions.php'); // Add this if needed for secure() function
 
-secure();
-
+secure(); // Uncomment if you want to check authentication
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $RecipeName = mysqli_real_escape_string($connect, $_POST["RecipeName"]);
-  $Instructions = mysqli_real_escape_string($connect, $_POST["RecipeInstructions"]);
-  $PrepTime = mysqli_real_escape_string($connect, $_POST["PrepTime"]);
-  $Servings = mysqli_real_escape_string($connect, $_POST["Servings"]);
-  $imagePath = "";
+  $RecipeName = $_POST["RecipeName"];
+  $Instructions = $_POST["Instructions"];
+  $PrepTime = $_POST["PrepTime"];
+  $Servings = $_POST["Servings"];
 
 
-  if (!empty($_FILES["image"]["name"])) {
-    $imagePath = 'uploads/' . basename($_FILES["image"]["name"]);
-    move_uploaded_file($_FILES["image"]["tmp_name"], $imagePath);
-  }
 
-
-  $query = "INSERT INTO Recipes (RecipeName, Instructions, PrepTime, Servings, Photo) VALUES ('$RecipeName','$Instructions','$PrepTime','$Servings','$imagePath')";
+  $query = "INSERT INTO recipes (RecipeName, Instructions, PrepTime, Servings) 
+            VALUES ('$RecipeName','$Instructions','$PrepTime','$Servings')";
   $result = mysqli_query($connect, $query);
 
-
-  if ($result && isset($_POST['ingredient']) && isset($_POST['quantity'])) {
-    $recipeId = mysqli_insert_id($connect);
-    for ($i = 0; $i < count($_POST['ingredient']); $i++) {
-      $ingredient = mysqli_real_escape_string($connect, $_POST['ingredient'][$i]);
-      $quantity = mysqli_real_escape_string($connect, $_POST['quantity'][$i]);
-      $ingredientQuery = "INSERT INTO Ingredients (RecipeID, IngredientName, Quantity) VALUES ('$recipeId', '$ingredient', '$quantity')";
-      mysqli_query($connect, $ingredientQuery);
-    }
-  }
-
   if ($result) {
-    set_message("Recipe Added Successfully");
+    // Get the ID of the newly inserted recipe
+    $recipeID = mysqli_insert_id($connect);
+    
+    // Process the ingredients
+    if (isset($_POST['ingredient']) && isset($_POST['quantity'])) {
+      for ($i = 0; $i < count($_POST['ingredient']); $i++) {
+        $ingredient = $_POST['ingredient'][$i];
+        $quantity = $_POST['quantity'][$i];
+        
+        if (!empty($ingredient) && !empty($quantity)) {
+          $ingredientQuery = "INSERT INTO ingredients (RecipeID, IngredientName, Quantity) 
+                              VALUES ('$recipeID', '$ingredient', '$quantity')";
+          mysqli_query($connect, $ingredientQuery);
+        }
+      }
+    }
+    
+    // Set success message in session
+    $_SESSION['message'] = "Recipe added successfully!";
+    $_SESSION['message_type'] = "success";
+    
+    // Redirect to recipes.php
+    header('Location: recipes.php');
+    exit(); // Make sure to exit after redirect
+  } else {
+    // Set error message in session
+    $_SESSION['message'] = "Error adding recipe: " . mysqli_error($connect);
+    $_SESSION['message_type'] = "danger";
+    
+    // Still redirect, but with error message
     header('Location: recipes.php');
     die();
-  } else {
-    set_message("Error: " . $connect->error);
   }
 }
 
-include('includes/header.php');
 ?>
 
-<div class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <h2 class="mb-4">Add New Recipe</h2>
-      <form action="recipe_add.php" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label for="RecipeName" class="form-label">Recipe Name</label>
-          <input type="text" class="form-control" name="RecipeName" id="RecipeName" required>
-        </div>
-        
-        <div class="mb-3">
-          <label for="RecipeInstructions" class="form-label">Recipe Instructions</label>
-          <textarea class="form-control" name="RecipeInstructions" id="RecipeInstructions" rows="5" required></textarea>
-        </div>
-        
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="Servings" class="form-label">Servings</label>
-            <input type="number" class="form-control" name="Servings" id="Servings" min="1" required>
-          </div>
-          
-          <div class="col-md-6 mb-3">
-            <label for="PrepTime" class="form-label">Prep Time (minutes)</label>
-            <input type="number" class="form-control" name="PrepTime" id="PrepTime" min="0" required>
-          </div>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
 
-        <div class="mb-3">
-          <label class="form-label">Ingredients</label>
-          <div id="ingredient-list">
-            <div class="row mb-2">
-              <div class="col-6">
-                <input type="text" class="form-control" name="ingredient[]" placeholder="Ingredient" required>
-              </div>
-              <div class="col-6">
-                <input type="text" class="form-control" name="quantity[]" placeholder="Quantity" required>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-secondary mt-2" onclick="addIngredient()">Add Another Ingredient</button>
-        </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Recipe</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
 
-        <div class="mb-3">
-          <label for="image" class="form-label">Recipe Image</label>
-          <input type="file" class="form-control" id="image" name="image">
-        </div>
+<body>
+  <?php include("includes/nav.php"); ?>
 
-        <button type="submit" class="btn btn-primary">Add Recipe</button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<script>
-function addIngredient() {
-  const ingredientList = document.getElementById('ingredient-list');
-  const newIngredient = `
-    <div class="row mb-2">
-      <div class="col-6">
-        <input type="text" class="form-control" name="ingredient[]" placeholder="Ingredient" required>
+  <div class="container mt-5">
+    <h2>Add Recipe</h2>
+    <form action="recipe_add.php" method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="RecipeName" class="form-label">Recipe Name</label>
+        <input type="text" name="RecipeName" id="RecipeName" class="form-control" required>
       </div>
-      <div class="col-6">
-        <input type="text" class="form-control" name="quantity[]" placeholder="Quantity" required>
+      <div class="mb-3">
+        <label for="Instructions" class="form-label">Recipe Instructions</label>
+        <textarea name="Instructions" id="Instructions" class="form-control" rows="4" required></textarea>
       </div>
-    </div>
-  `;
-  ingredientList.insertAdjacentHTML('beforeend', newIngredient);
-}
-</script>
+      <div class="mb-3">
+        <label for="Servings" class="form-label">Servings</label>
+        <input type="number" name="Servings" id="Servings" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="PrepTime" class="form-label">Prep Time (in minutes)</label>
+        <input type="number" name="PrepTime" id="PrepTime" class="form-control" required>
+      </div>
 
-<?php
-include('includes/footer.php');
-?>
+      <h4>Ingredients:</h4>
+      <div id="ingredient-list">
+        <div class="mb-3">
+          <label for="ingredient[]" class="form-label">Ingredient</label>
+          <input type="text" name="ingredient[]" class="form-control" required>
+
+          <label for="quantity[]" class="form-label">Quantity</label>
+          <input type="text" name="quantity[]" class="form-control" required>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary mb-3" onclick="addIngredient()">Add Another Ingredient</button>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success">Add Recipe</button>
+        </div>
+    </form>
+
+        <div class="mt-3">
+            <a href="recipes.php" class="btn btn-secondary"><i class="fas fa-arrow-circle-left"></i> Back to Recipes</a>
+        </div>
+    </div>
+
+  <script>
+    function addIngredient() {
+      const ingredientList = document.getElementById('ingredient-list');
+      const newIngredient = `
+        <div class="mb-3">
+          <label for="ingredient[]" class="form-label">Ingredient</label>
+          <input type="text" name="ingredient[]" class="form-control" required>
+
+          <label for="quantity[]" class="form-label">Quantity</label>
+          <input type="text" name="quantity[]" class="form-control" required>
+        </div>
+      `;
+      ingredientList.insertAdjacentHTML('beforeend', newIngredient);
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
