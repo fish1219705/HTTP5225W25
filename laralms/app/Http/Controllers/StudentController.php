@@ -35,7 +35,8 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
-        Student::create($request->validated());
+        $student = Student::create($request->validated());
+        $student -> courses() -> attach($request -> course);
         return redirect()->route('students.index');
     }
 
